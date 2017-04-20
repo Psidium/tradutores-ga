@@ -24,6 +24,22 @@ def compute_arithmetic_lexeme(lexeme):
     else:
         return [token]
 
+def compute_arithmetic_expression(line):
+    expression = re.compile('\s*(?:([-+*/])\s*((?:[-+])?(?:\d+(?:\.\d+)?|\w(?:(?:\w|\d)+)?))|((?:[-+])?(?:\d+(?:\.\d+)?|\w(?:(?:\w|\d)+)?)))\s*') # Error here: accepts other mixed expressions
+    matches = expression.findall(line)
+    tokens = []
+
+    if len(matches) == 0:
+        raise Exception('Invalid attribution expression for line : ' + line)
+
+    for (operator, number, numberOnly) in matches:
+        if numberOnly:
+            tokens += compute_arithmetic_lexeme(numberOnly)
+        else:
+            tokens.append(Token('arith_op', operator))
+            tokens += compute_arithmetic_lexeme(number)
+
+    return tokens
 
 class Token:
     def __init__(self, token, lexeme):
@@ -38,6 +54,7 @@ class Token:
         return self.__str__()
 
 
+
 class AttributionExpression:
     def __init__(self, tokens):
         self.type = tokens.group(1)
@@ -50,22 +67,6 @@ class AttributionExpression:
 
         return [Token('reserved_word', self.type), Token('id', self.name), Token('equal_op', '=')] + self.compute_right_side_tokens()
 
-    def compute_arithmetic_expression(self):
-        expression = re.compile('\s*(?:([-+*/])\s*((?:[-+])?(?:\d+(?:\.\d+)?|\w(?:(?:\w|\d)+)?))|((?:[-+])?(?:\d+(?:\.\d+)?|\w(?:(?:\w|\d)+)?)))\s*') # Error here: accepts other mixed expressions
-        matches = expression.findall(self.right_side)
-        tokens = []
-
-        if len(matches) == 0:
-            raise Exception('Invalid attribution expression for type "' + self.type + '": ' + self.right_side)
-
-        for (operator, number, numberOnly) in matches:
-            if numberOnly:
-                tokens += compute_arithmetic_lexeme(numberOnly)
-            else:
-                tokens.append(Token('arith_op', operator))
-                tokens += compute_arithmetic_lexeme(number)
-
-        return tokens
 
     def compute_simple_expression(self, regex, token_identifier):
         match = regex.match(self.right_side)
@@ -86,7 +87,7 @@ class AttributionExpression:
         if self.type == 'string':
             return self.compute_string()
         elif re.search('^(int|float|double)$', self.type):
-            return self.compute_arithmetic_expression()
+            return compute_arithmetic_expression(self.right_side)
         elif self.type == 'bool':
             return self.compute_boolean()
         else:
@@ -121,8 +122,6 @@ class FlowExpression:
         import tradutor_lexico
         tokens = [ Token('reserved_word', self.flow_start) ] + self.comparison.get_tokens()
         try:
-            import pdb
-            pdb.set_trace()
             tokens += tradutor_lexico.generate_tokens(self.block)
             tokens.append(Token('reserved_word', self.flow_else))
             tokens += tradutor_lexico.generate_tokens(self.else_block)
@@ -134,7 +133,18 @@ class FlowExpression:
 
 class ComparisonExpression:
     def __init__(self, tokens):
-        self.tokens = tokens
+        if isinstance(tokens, basestring):
+            comparison = re.compile('\s*(.+)\s+?(<|>|==|<=|>=|!=)\s+?(.+)\s*')
+            groups = comparison.match(tokens)
+            if groups is None:
+                raise Exception('Can\'t parse comparison: ' + tokens)
+            tokens = groups
+        self.first_arg = tokens.group(1)
+        self.comparison = tokens.group(2)
+        self.second_arg = tokens.group(3)
 
     def get_tokens(self):
-        return []
+        tokens = compute_arithmetic_expression(self.first_arg)
+        tokens += [ Token('relational_operator', self.comparison) ]
+        tokens += compute_arithmetic_expression(self.second_arg)
+        return tokens
