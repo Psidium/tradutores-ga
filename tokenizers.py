@@ -1,13 +1,25 @@
 import re
 
 
+lookup_table = {}
+
+
+def get_name_identifier(name):
+    try:
+        return lookup_table[name]
+    except KeyError:
+        new_id = len(lookup_table) + 1
+        lookup_table[name] = new_id
+        return new_id
+
+
 class Token:
     def __init__(self, token, lexeme):
         self.token = token
         self.lexeme = lexeme
 
     def __str__(self):
-        return '[' + self.token + ', ' + self.lexeme + ']'
+        return '[' + self.token + ', ' + self.lexeme.__str__() + ']'
 
     def __repr__(self):
         return self.__str__()
@@ -23,7 +35,7 @@ class AttributionExpression:
         if not re.search('^(int|float|double|string|bool)$', self.type):
             raise Exception('Unknown type "' + self.type + '"')
 
-        return [Token('reserved_word', self.type), Token('id', self.name), Token('equal_op', '=')] + self.compute_right_side_tokens()
+        return [Token('reserved_word', self.type), Token('id', get_name_identifier(self.name)), Token('equal_op', '=')] + self.compute_right_side_tokens()
 
     def compute_number_expression(self):
         expression = re.compile('\s*(?:([-+*/])\s*((?:[-+])?\d+(?:\.\d+)?)|((?:[-+])?\d+(?:\.\d+)?))\s*') # Error here: accepts other mixed expressions
@@ -77,7 +89,7 @@ class DefinitionExpression:
         if not re.search('^(int|float|double|string|bool)$', self.type):
             raise Exception('Unknown type "' + self.type + '"')
 
-        return [Token('reserved_word', self.type), Token('id', self.name)]
+        return [Token('reserved_word', self.type), Token('id', get_name_identifier(self.name))]
 
 
 class IfExpression:
