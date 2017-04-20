@@ -13,3 +13,5 @@ string helloWorld = "Hello World";
 bool t = true;
 
 double aNumber = 2.67 - 6;
+
+int t = 45;
