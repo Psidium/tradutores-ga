@@ -160,7 +160,7 @@ class ForExpression:
         self.reserved = tokens.group(1)
         self.attribution = AttributionExpression(tokens.group(2))
         self.comparison = ComparisonExpression(tokens.group(3))
-        self.aritm = tokens.group(4)
+        self.aritm = AttributionExpression(tokens.group(4))
         try:
             self.block = tokens.group(5)
         except IndexError:
@@ -171,7 +171,7 @@ class ForExpression:
         tokens = [Token('reserved_word', self.reserved)]
         tokens += self.attribution.get_tokens()
         tokens += self.comparison.get_tokens()
-        tokens += compute_arithmetic_expression(self.aritm)
+        tokens += self.aritm.get_tokens()
         try:
             tokens += tradutor_lexico.generate_tokens(self.block)
         except AttributeError:
