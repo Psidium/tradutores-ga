@@ -1,6 +1,5 @@
 import re
 
-
 lookup_table = {}
 
 
@@ -106,6 +105,36 @@ class DefinitionExpression:
         return [Token('reserved_word', self.type), Token('id', self.name)]
 
 
-class IfExpression:
+class FlowExpression:
+    '''A Flow Expression is an `if` (followed or not by an else) or `while`'''
     def __init__(self, tokens):
-        pass
+        self.flow_start = tokens.group(1)
+        self.comparison = ComparisonExpression(tokens.group(2))
+        try:
+            self.block = tokens.group(3)
+            self.flow_else = tokens.group(4)
+            self.else_block = tokens.group(5)
+        except IndexError:
+            pass
+
+    def get_tokens(self):
+        import tradutor_lexico
+        tokens = [ Token('reserved_word', self.flow_start) ] + self.comparison.get_tokens()
+        try:
+            import pdb
+            pdb.set_trace()
+            tokens += tradutor_lexico.generate_tokens(self.block)
+            tokens.append(Token('reserved_word', self.flow_else))
+            tokens += tradutor_lexico.generate_tokens(self.else_block)
+        except AttributeError:
+            pass
+        except TypeError:
+            pass
+        return tokens
+
+class ComparisonExpression:
+    def __init__(self, tokens):
+        self.tokens = tokens
+
+    def get_tokens(self):
+        return []

@@ -17,3 +17,7 @@ double aNumber = 2.67 - 6 + j;
 int t = 45;
 
 float thisIsANumberWhichHasANiceArithmeticExpression = 5 + aNumber * 0.10 + j/-t;
+
+if (t < 45)
+
+if (t < 45) { int b = 2;} else { float g;}

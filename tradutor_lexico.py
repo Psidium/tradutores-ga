@@ -6,11 +6,15 @@ import tokenizers
 
 # Script
 expressions = [{
-    'regex': re.compile('(\w(?:(?:\w|\d)+)?)\s+(\w(?:(?:\w|\d)+)?)\s*=(.+?);'),
+    'regex': re.compile('\s*(\w(?:(?:\w|\d)+)?)\s+(\w(?:(?:\w|\d)+)?)\s*=(.+?);\s*'),
     'tokenizer': tokenizers.AttributionExpression
 }, {
-    'regex': re.compile('(\w(?:(?:\w|\d)+)?)\s+(\w(?:(\w|\d)+)?)\s*;'),
+    'regex': re.compile('\s*(\w(?:(?:\w|\d)+)?)\s+(\w(?:(\w|\d)+)?)\s*;\s*'),
     'tokenizer': tokenizers.DefinitionExpression
+}, {
+    'regex':
+    re.compile('\s*(if|while)\s*(?:\((.+)\))\s*(?:{([^}]+)})?(?:\s*(else)\s*(?:{(.+)}))?\s*'),
+    'tokenizer': tokenizers.FlowExpression
 }]
 
 

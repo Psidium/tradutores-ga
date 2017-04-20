@@ -9,7 +9,7 @@ class TestLexical(unittest.TestCase):
         self.assertEquals(tokens[0].token, "reserved_word")
         self.assertEquals(tokens[0].lexeme, "int")
         self.assertEquals(tokens[1].token, "id")
-        self.assertEquals(tokens[1].lexeme, "a")
+        self.assertEquals(tokens[1].lexeme, 1)
 
     def test_definition_with_comments(self):
         tokens = tradutor_lexico.generate_tokens("int a; // 'a' is a terrible variable name")
@@ -17,7 +17,7 @@ class TestLexical(unittest.TestCase):
         self.assertEquals(tokens[0].token, "reserved_word")
         self.assertEquals(tokens[0].lexeme, "int")
         self.assertEquals(tokens[1].token, "id")
-        self.assertEquals(tokens[1].lexeme, "a")
+        self.assertEquals(tokens[1].lexeme, 1)
 
     def test_attribution(self):
         tokens = tradutor_lexico.generate_tokens("int a = 32;")
@@ -25,7 +25,7 @@ class TestLexical(unittest.TestCase):
         self.assertEquals(tokens[0].token, "reserved_word")
         self.assertEquals(tokens[0].lexeme, "int")
         self.assertEquals(tokens[1].token, "id")
-        self.assertEquals(tokens[1].lexeme, "a")
+        self.assertEquals(tokens[1].lexeme, 1)
         self.assertEquals(tokens[2].token, "equal_op")
         self.assertEquals(tokens[2].lexeme, "=")
         self.assertEquals(tokens[3].token, "num")
@@ -37,7 +37,7 @@ class TestLexical(unittest.TestCase):
         self.assertEquals(tokens[0].token, "reserved_word")
         self.assertEquals(tokens[0].lexeme, "int")
         self.assertEquals(tokens[1].token, "id")
-        self.assertEquals(tokens[1].lexeme, "a")
+        self.assertEquals(tokens[1].lexeme, 1)
         self.assertEquals(tokens[2].token, "equal_op")
         self.assertEquals(tokens[2].lexeme, "=")
         self.assertEquals(tokens[3].token, "num")
@@ -47,6 +47,10 @@ class TestLexical(unittest.TestCase):
         tokens = tradutor_lexico.generate_tokens("int = int")
         self.assertEquals(tokens, None)
 
+    def test_if_sentece(self):
+        tokens = tradutor_lexico.generate_tokens("if (3 < 4) { int a = 32; }" +
+                                                 "else { int b = 2; }")
+        self.assertEquals(len(tokens), 19)
 
 if __name__ == "__main__":
     unittest.main()
