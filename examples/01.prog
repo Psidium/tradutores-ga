@@ -7,4 +7,9 @@ int x = 7;
 int y;
 
 int j =7 +9.5/2 ; // This is a superb attribution
+string myName = null;
+string helloWorld = "Hello World";
 
+bool t = true;
+
+double aNumber = 2.67 - 6;
