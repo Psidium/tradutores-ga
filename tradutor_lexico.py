@@ -49,6 +49,7 @@ def print_tokens(tokens):
         print token,
     print
 
+
 def generate_tokens(expression):
     tokenizer = get_tokenizer(expression)
     if tokenizer is not None:
@@ -58,6 +59,7 @@ def generate_tokens(expression):
             print(e.message)
     else:
         return None
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
@@ -69,5 +71,4 @@ if __name__ == "__main__":
         if tokens is not None:
             print_tokens(tokens)
         else:
-            print('Failed to compute expression: "' + expression + '"')
-
+            print('Failed to compute expression: "' + line + '"')

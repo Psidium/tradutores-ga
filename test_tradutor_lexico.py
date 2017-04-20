@@ -1,6 +1,7 @@
 import unittest
 import tradutor_lexico
 
+
 class TestLexical(unittest.TestCase):
     def test_definition(self):
         tokens = tradutor_lexico.generate_tokens("int a;")
@@ -18,7 +19,6 @@ class TestLexical(unittest.TestCase):
         self.assertEquals(tokens[1].token, "id")
         self.assertEquals(tokens[1].lexeme, "a")
 
-
     def test_attribution(self):
         tokens = tradutor_lexico.generate_tokens("int a = 32;")
         self.assertEquals(len(tokens), 4)
@@ -30,7 +30,6 @@ class TestLexical(unittest.TestCase):
         self.assertEquals(tokens[2].lexeme, "=")
         self.assertEquals(tokens[3].token, "num")
         self.assertEquals(tokens[3].lexeme, "32")
-
 
     def test_attribution_with_comments(self):
         tokens = tradutor_lexico.generate_tokens("int a = 32; //a again")
@@ -47,6 +46,7 @@ class TestLexical(unittest.TestCase):
     def test_should_return_none_when_invalid_command(self):
         tokens = tradutor_lexico.generate_tokens("int = int")
         self.assertEquals(tokens, None)
+
 
 if __name__ == "__main__":
     unittest.main()
