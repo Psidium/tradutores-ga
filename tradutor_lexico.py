@@ -18,6 +18,9 @@ expressions = [{
 }, {
     'regex': re.compile('\s*(for)\s*(?:\((.+);(.+);(.+)\))\s*(?:{([^}]+)})'),
     'tokenizer': tokenizers.ForExpression
+}, {
+    'regex': re.compile('\s*(return|printf|do).*;?'),
+    'tokenizer': tokenizers.ReservedExpression
 }]
 
 

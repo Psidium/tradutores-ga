@@ -179,3 +179,10 @@ class ForExpression:
         except TypeError:
             pass
         return tokens
+
+class ReservedExpression:
+    def __init__(self, tokens):
+        self.reserved = tokens.group(1)
+
+    def get_tokens(self):
+        return [Token('reserved_word', self.reserved)]
