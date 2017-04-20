@@ -171,7 +171,7 @@ class ForExpression:
         tokens = [Token('reserved_word', self.reserved)]
         tokens += self.attribution.get_tokens()
         tokens += self.comparison.get_tokens()
-        tokens += compute_arithmetic_expression(self.artm)
+        tokens += compute_arithmetic_expression(self.aritm)
         try:
             tokens += tradutor_lexico.generate_tokens(self.block)
         except AttributeError:
