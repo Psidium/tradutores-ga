@@ -15,6 +15,9 @@ expressions = [{
     'regex':
     re.compile('\s*(if|while)\s*(?:\((.+)\))\s*(?:{([^}]+)})?(?:\s*(else)\s*(?:{(.+)}))?\s*'),
     'tokenizer': tokenizers.FlowExpression
+}, {
+    'regex': re.compile('\s*(for)\s*(?:\((.+);(.+);(.+)\))\s*(?:{([^}]+)})'),
+    'tokenizer': tokenizers.ForExpression
 }]
 
 

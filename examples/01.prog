@@ -20,7 +20,7 @@ float thisIsANumberWhichHasANiceArithmeticExpression = 5 + aNumber * 0.10 + j/-t
 
 if (t < 45)
 while (1 == 45)
-for (f == 4)
-fred ( o < a )
+
+for (int i = 0; i < 10; int i = i + 1)  { double fred = 10 * 2; }
 
 if (t < 45) { int b = 2;} else { float g;}

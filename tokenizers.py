@@ -30,6 +30,8 @@ def compute_arithmetic_expression(line):
     tokens = []
 
     if len(matches) == 0:
+        import pdb
+        pdb.set_trace()
         raise Exception('Invalid attribution expression for line : ' + line)
 
     for (operator, number, numberOnly) in matches:
@@ -57,6 +59,12 @@ class Token:
 
 class AttributionExpression:
     def __init__(self, tokens):
+        if isinstance(tokens, basestring):
+            comparison = re.compile('\s*(\w(?:(?:\w|\d)+)?)\s+(\w(?:(?:\w|\d)+)?)\s*=(.+?)\s*')
+            groups = comparison.match(tokens)
+            if groups is None:
+                raise Exception('Can\'t parse attribution: ' + tokens)
+            tokens = groups
         self.type = tokens.group(1)
         self.name = tokens.group(2)
         self.right_side = tokens.group(3)
@@ -147,4 +155,30 @@ class ComparisonExpression:
         tokens = compute_arithmetic_expression(self.first_arg)
         tokens += [ Token('relational_operator', self.comparison) ]
         tokens += compute_arithmetic_expression(self.second_arg)
+        return tokens
+
+class ForExpression:
+    def __init__(self, tokens):
+        import pdb; pdb.set_trace()
+        self.reserved = tokens.group(1)
+        self.attribution = AttributionExpression(tokens.group(2))
+        self.comparison = ComparisonExpression(tokens.group(3))
+        self.aritm = tokens.group(4)
+        try:
+            self.block = tokens.group(5)
+        except IndexError:
+            pass
+
+    def get_tokens(self):
+        import tradutor_lexico
+        tokens = [Token('reserved_word', self.reserved)]
+        tokens += self.attribution.get_tokens()
+        tokens += self.comparison.get_tokens()
+        tokens += compute_arithmetic_expression(self.artm)
+        try:
+            tokens += tradutor_lexico.generate_tokens(self.block)
+        except AttributeError:
+            pass
+        except TypeError:
+            pass
         return tokens
