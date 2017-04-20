@@ -2,49 +2,15 @@
 
 import sys
 import re
-
-
-class AttributionExpression:
-    def __init__(self, tokens):
-        self.type = tokens.group(1)
-        self.name = tokens.group(2)
-        self.right_side = tokens.group(3)
-
-    def get_tokens(self):
-        return ['[reserved_word, ' + self.type + ']', '[id, ' + self.name + ']',
-                '[equal_op, =]'] + self.compute_right_side()
-
-    def compute_right_side(self):
-        expression = re.compile('(?:([-+*/])\s*((?:[-+])?\d+(?:\.\d+)?)|((?:[-+])?\d+(?:\.\d+)?))')
-        matches = expression.findall(self.right_side)
-        tokens = []
-
-        for (operator, number, numberOnly) in matches:
-            if numberOnly:
-                tokens.append('[num, ' + numberOnly + ']')
-            else:
-                tokens.append('[arith_op, ' + operator + ']')
-                tokens.append('[num, ' + number + ']')
-
-        return tokens
-
-
-class DefinitionExpression:
-    def __init__(self, tokens):
-        self.type = tokens.group(1)
-        self.name = tokens.group(2)
-
-    def get_tokens(self):
-        return ['[reserved_word, ' + self.type + ']', '[id, ' + self.name + ']']
-
+import tokenizers
 
 # Script
 expressions = [{
-    'regex': re.compile('(int|float)\s+(\w(?:(?:\w|\d)+)?)\s*=\s*((?:[-+])?\d+(?:\.\d+)?\s*(?:(?:[-+*/]\s*(?:(?:[-+])?\d+(?:\.\d+)?))+)?)\s*;'),
-    'tokenizer': AttributionExpression
+    'regex': re.compile('(\w(?:(?:\w|\d)+)?)\s+(\w(?:(?:\w|\d)+)?)\s*=(.+?);'),
+    'tokenizer': tokenizers.AttributionExpression
 }, {
-    'regex': re.compile('(int|float)\s+(\w(?:(\w|\d)+)?)\s*;'),
-    'tokenizer': DefinitionExpression
+    'regex': re.compile('(\w(?:(?:\w|\d)+)?)\s+(\w(?:(\w|\d)+)?)\s*;'),
+    'tokenizer': tokenizers.DefinitionExpression
 }]
 
 
@@ -80,7 +46,10 @@ def get_tokenizer(program_line):
 
 
 def print_tokens(tokens):
-    print(' '.join(tokens))
+    for token in tokens:
+        print token,
+
+    print
 
 
 if len(sys.argv) < 2:
@@ -91,7 +60,11 @@ program_lines = read_program_from_file(sys.argv[1])
 
 for line in program_lines:
     tokenizer = get_tokenizer(line)
+
     if tokenizer is not None:
-        print_tokens(tokenizer.get_tokens())
+        try:
+            print_tokens(tokenizer.get_tokens())
+        except Exception as e:
+            print(e.message)
     else:
         print('Failed to compute expression: "' + line + '"')
