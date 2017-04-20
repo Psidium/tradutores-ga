@@ -13,13 +13,27 @@ def get_name_identifier(name):
         return new_id
 
 
+def compute_arithmetic_lexeme(lexeme):
+    match = re.match('^([-+])?(.+?)$', lexeme)
+    unary_operator = match.group(1)
+    detached_lexeme = match.group(2)
+    token_identifier = 'num' if re.search('\d+(?:\.\d+)?', detached_lexeme) else 'id'
+    token = Token(token_identifier, detached_lexeme)
+
+    if unary_operator:
+        return [Token('unary_op', unary_operator), token]
+    else:
+        return [token]
+
+
 class Token:
     def __init__(self, token, lexeme):
         self.token = token
         self.lexeme = lexeme
 
     def __str__(self):
-        return '[' + self.token + ', ' + self.lexeme.__str__() + ']'
+        lexeme = get_name_identifier(self.lexeme) if self.token == 'id' else self.lexeme
+        return '[' + self.token + ', ' + lexeme.__str__() + ']'
 
     def __repr__(self):
         return self.__str__()
@@ -35,10 +49,10 @@ class AttributionExpression:
         if not re.search('^(int|float|double|string|bool)$', self.type):
             raise Exception('Unknown type "' + self.type + '"')
 
-        return [Token('reserved_word', self.type), Token('id', get_name_identifier(self.name)), Token('equal_op', '=')] + self.compute_right_side_tokens()
+        return [Token('reserved_word', self.type), Token('id', self.name), Token('equal_op', '=')] + self.compute_right_side_tokens()
 
-    def compute_number_expression(self):
-        expression = re.compile('\s*(?:([-+*/])\s*((?:[-+])?\d+(?:\.\d+)?)|((?:[-+])?\d+(?:\.\d+)?))\s*') # Error here: accepts other mixed expressions
+    def compute_arithmetic_expression(self):
+        expression = re.compile('\s*(?:([-+*/])\s*((?:[-+])?(?:\d+(?:\.\d+)?|\w(?:(?:\w|\d)+)?))|((?:[-+])?(?:\d+(?:\.\d+)?|\w(?:(?:\w|\d)+)?)))\s*') # Error here: accepts other mixed expressions
         matches = expression.findall(self.right_side)
         tokens = []
 
@@ -47,10 +61,10 @@ class AttributionExpression:
 
         for (operator, number, numberOnly) in matches:
             if numberOnly:
-                tokens.append(Token('num', numberOnly))
+                tokens += compute_arithmetic_lexeme(numberOnly)
             else:
                 tokens.append(Token('arith_op', operator))
-                tokens.append(Token('num', number))
+                tokens += compute_arithmetic_lexeme(number)
 
         return tokens
 
@@ -73,7 +87,7 @@ class AttributionExpression:
         if self.type == 'string':
             return self.compute_string()
         elif re.search('^(int|float|double)$', self.type):
-            return self.compute_number_expression()
+            return self.compute_arithmetic_expression()
         elif self.type == 'bool':
             return self.compute_boolean()
         else:
@@ -89,7 +103,7 @@ class DefinitionExpression:
         if not re.search('^(int|float|double|string|bool)$', self.type):
             raise Exception('Unknown type "' + self.type + '"')
 
-        return [Token('reserved_word', self.type), Token('id', get_name_identifier(self.name))]
+        return [Token('reserved_word', self.type), Token('id', self.name)]
 
 
 class IfExpression:
