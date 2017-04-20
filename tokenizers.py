@@ -30,8 +30,6 @@ def compute_arithmetic_expression(line):
     tokens = []
 
     if len(matches) == 0:
-        import pdb
-        pdb.set_trace()
         raise Exception('Invalid attribution expression for line : ' + line)
 
     for (operator, number, numberOnly) in matches:
@@ -60,7 +58,7 @@ class Token:
 class AttributionExpression:
     def __init__(self, tokens):
         if isinstance(tokens, basestring):
-            comparison = re.compile('\s*(\w(?:(?:\w|\d)+)?)\s+(\w(?:(?:\w|\d)+)?)\s*=(.+?)\s*')
+            comparison = re.compile('\s*(\w(?:(?:\w|\d)+)?)\s+(\w(?:(?:\w|\d)+)?)\s*=(.*);?\s*')
             groups = comparison.match(tokens)
             if groups is None:
                 raise Exception('Can\'t parse attribution: ' + tokens)
@@ -159,7 +157,6 @@ class ComparisonExpression:
 
 class ForExpression:
     def __init__(self, tokens):
-        import pdb; pdb.set_trace()
         self.reserved = tokens.group(1)
         self.attribution = AttributionExpression(tokens.group(2))
         self.comparison = ComparisonExpression(tokens.group(3))
