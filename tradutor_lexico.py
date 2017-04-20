@@ -41,30 +41,33 @@ def get_tokenizer(program_line):
         tokens = expression['regex'].match(program_line)
         if tokens is not None:
             return expression['tokenizer'](tokens)
-
     return None
 
 
 def print_tokens(tokens):
     for token in tokens:
         print token,
-
     print
 
-
-if len(sys.argv) < 2:
-    print('Wrong number of arguments passed.')
-    sys.exit()
-
-program_lines = read_program_from_file(sys.argv[1])
-
-for line in program_lines:
-    tokenizer = get_tokenizer(line)
-
+def generate_tokens(expression):
+    tokenizer = get_tokenizer(expression)
     if tokenizer is not None:
         try:
-            print_tokens(tokenizer.get_tokens())
+            return tokenizer.get_tokens()
         except Exception as e:
             print(e.message)
     else:
-        print('Failed to compute expression: "' + line + '"')
+        return None
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print('Wrong number of arguments passed.')
+        sys.exit()
+    program_lines = read_program_from_file(sys.argv[1])
+    for line in program_lines:
+        tokens = generate_tokens(line)
+        if tokens is not None:
+            print_tokens(tokens)
+        else:
+            print('Failed to compute expression: "' + expression + '"')
+
